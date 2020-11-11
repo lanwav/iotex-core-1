@@ -152,6 +152,7 @@ func (l *LogFilter) ExistInBloomFilter(bf bloom.BloomFilter) bool {
 
 // ExistInBloomFilterv2 returns true if addresses and topics of filter exist in the range bloom filter (topic: position-sensitive)
 func (l *LogFilter) ExistInBloomFilterv2(bf bloom.BloomFilter) bool {
+	fmt.Println("start ExistInBloomFilterv2")
 	if len(l.pbFilter.Address) > 0 {
 		flag := false
 		for _, addr := range l.pbFilter.Address {
