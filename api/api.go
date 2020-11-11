@@ -10,6 +10,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/hex"
+	"fmt"
 	"math"
 	"math/big"
 	"net"
@@ -693,6 +694,7 @@ func (api *Server) GetLogs(
 		if paginationSize == 0 {
 			paginationSize = 1000
 		}
+		fmt.Println("called getLogsByRange API")
 		logs, err = api.getLogsInRange(logfilter.NewLogFilter(in.GetFilter(), nil, nil), startBlock, endBlock, paginationSize)
 	default:
 		return nil, status.Error(codes.InvalidArgument, "invalid GetLogsRequest type")
@@ -1474,6 +1476,7 @@ func (api *Server) getLogsInBlock(filter *logfilter.LogFilter, blockNumber uint6
 	if !filter.ExistInBloomFilterv2(logBloomFilter) {
 		return nil, nil
 	}
+	fmt.Println("block-level BF pass in blockNumber", blockNumber)
 	receipts, err := api.dao.GetReceipts(blockNumber)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -1496,11 +1499,13 @@ func (api *Server) getLogsInRange(filter *logfilter.LogFilter, start, end, pagin
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("getLogsInRange: 4096BF result", blockNumbers)
 	for _, i := range blockNumbers {
 		logsInBlock, err := api.getLogsInBlock(filter, i)
 		if err != nil {
 			return nil, err
 		}
+		fmt.Println("matched logs in Block", i)
 		for _, log := range logsInBlock {
 			logs = append(logs, log)
 			if len(logs) >= int(paginationSize) {

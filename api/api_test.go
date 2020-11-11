@@ -9,6 +9,7 @@ package api
 import (
 	"context"
 	"encoding/hex"
+	"fmt"
 	"math"
 	"math/big"
 	"strconv"
@@ -715,7 +716,7 @@ var (
 			numLogs:   4,
 		},
 		{
-			address:   []string{},
+			address:   []string{"io154mvzs09vkgn0hw6gg3ayzw5w39jzp47f8py9v"},
 			topics:    []*iotexapi.Topics{},
 			fromBlock: 1,
 			count:     100,
@@ -1838,6 +1839,7 @@ func TestServer_GetLogs(t *testing.T) {
 		res, err := svr.GetLogs(context.Background(), request)
 		require.NoError(err)
 		logs := res.Logs
+		fmt.Println("logs:", logs)
 		require.Equal(test.numLogs, len(logs))
 	}
 }
