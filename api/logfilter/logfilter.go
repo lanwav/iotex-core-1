@@ -2,6 +2,7 @@ package logfilter
 
 import (
 	"bytes"
+	"fmt"
 
 	"github.com/iotexproject/go-pkgs/bloom"
 	"github.com/iotexproject/iotex-proto/golang/iotexapi"
@@ -162,7 +163,7 @@ func (l *LogFilter) ExistInBloomFilterv2(bf bloom.BloomFilter) bool {
 			return false
 		}
 	}
-
+	fmt.Println("in ExistInBloomFilterv2, pass address filtering")
 	if len(l.pbFilter.Topics) > 0 {
 		for i, e := range l.pbFilter.Topics {
 			if e == nil || len(e.Topic) == 0 {
@@ -181,6 +182,7 @@ func (l *LogFilter) ExistInBloomFilterv2(bf bloom.BloomFilter) bool {
 		}
 		return true
 	}
+	fmt.Println("in ExistInBloomFilterv2, pass everyhing filtering")
 
 	// {} or nil matches any address or topic list
 	return true
@@ -189,6 +191,8 @@ func (l *LogFilter) ExistInBloomFilterv2(bf bloom.BloomFilter) bool {
 // SelectBlocksFromRangeBloomFilter filters out RangeBloomFilter for selecting block numbers which have logFilter's topics/address
 // TODO[dorothy]: optimize using goroutine
 func (l *LogFilter) SelectBlocksFromRangeBloomFilter(bf bloom.BloomFilter, start, end uint64) []uint64 {
+	fmt.Println("in SelectBlocksFromRangeBloomFilter, start:", start)
+	fmt.Println("in SelectBlocksFromRangeBloomFilter, end:", end)
 	blkNums := make([]uint64, 0)
 	for blockHeight := start; blockHeight <= end; blockHeight++ {
 		Heightkey := append([]byte(BlockHeightPrefix), byteutil.Uint64ToBytes(blockHeight)...)
@@ -203,6 +207,7 @@ func (l *LogFilter) SelectBlocksFromRangeBloomFilter(bf bloom.BloomFilter, start
 				continue
 			}
 		}
+		fmt.Println("in SelectBlocksFromRangeBloomFilter, pass address filtering block number", blockHeight)
 		if len(l.pbFilter.Topics) > 0 {
 			flag := false
 			for _, e := range l.pbFilter.Topics {
@@ -223,6 +228,7 @@ func (l *LogFilter) SelectBlocksFromRangeBloomFilter(bf bloom.BloomFilter, start
 				continue
 			}
 		}
+		fmt.Println("in SelectBlocksFromRangeBloomFilter, pass everything filtering block number", blockHeight)
 		blkNums = append(blkNums, blockHeight)
 	}
 	return blkNums

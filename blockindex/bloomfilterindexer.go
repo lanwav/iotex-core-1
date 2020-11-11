@@ -8,6 +8,7 @@ package blockindex
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/iotexproject/go-pkgs/bloom"
@@ -167,6 +168,7 @@ func (bfx *bloomfilterIndexer) FilterBlocksInRange(l *filter.LogFilter, start, e
 			return nil, errors.Wrapf(err, "failed to get rangeBloomFilter from indexer by given height %d", queryHeight)
 		}
 		if l.ExistInBloomFilterv2(bigBloom) {
+			fmt.Println("it pass ExistInBloomFilterv2 function")
 			blocks := l.SelectBlocksFromRangeBloomFilter(bigBloom, queryHeight-bfx.rangeSize+1, queryHeight)
 			for _, num := range blocks {
 				if num >= start && num <= end {
