@@ -229,6 +229,10 @@ func TestBloomfilterIndexer(t *testing.T) {
 		testinglf := logfilter.NewLogFilter(testFilter[2], nil, nil)
 
 		for i := 0; i < int(rangeBloomfilterSize)+1; i++ {
+			if i == 4 {
+				require.NoError(indexer.Stop(ctx))
+				require.NoError(indexer.Start(ctx)) // restart in the middle of the range
+			}
 			require.NoError(indexer.PutBlock(context.Background(), blks[i]))
 			height, err := indexer.Height()
 			require.NoError(err)

@@ -79,6 +79,7 @@ func (bfx *bloomfilterIndexer) Start(ctx context.Context) error {
 		tipHeight := byteutil.BytesToUint64(tipHeightData)
 		if tipHeight%bfx.rangeSize == 0 {
 			bfx.curRangeBloomfilter, _ = bloom.NewBloomFilter(2048, 3)
+			fmt.Println("initialize curRangeBloomfilter tipHeight:", tipHeight)
 		} else {
 			bfx.curRangeBloomfilter, err = bfx.rangeBloomFilter(tipHeight)
 			if err != nil {
@@ -90,6 +91,7 @@ func (bfx *bloomfilterIndexer) Start(ctx context.Context) error {
 			return err
 		}
 		bfx.curRangeBloomfilter, _ = bloom.NewBloomFilter(2048, 3)
+		fmt.Println("initialize curRangeBloomfilter")
 	default:
 		return err
 	}
@@ -124,6 +126,7 @@ func (bfx *bloomfilterIndexer) PutBlock(ctx context.Context, blk *block.Block) (
 		if err != nil {
 			return errors.Wrapf(err, "Can not create new bloomfilter")
 		}
+		fmt.Println("initialize curRangeBloomfilter blkHeight:", blk.Height())
 	}
 	return nil
 }
@@ -244,6 +247,7 @@ func (bfx *bloomfilterIndexer) processBlock(ctx context.Context, blockNumber uin
 	for _, receipt := range receipts {
 		for _, l := range receipt.Logs() {
 			bloom.Add([]byte(l.Address))
+			fmt.Println("add address into curRangeBloomfilter:", l.Address)
 			bfx.curRangeBloomfilter.Add([]byte(l.Address))
 			bfx.curRangeBloomfilter.Add(append(Heightkey, []byte(l.Address)...)) // concatenate with block number
 			for i, topic := range l.Topics {
